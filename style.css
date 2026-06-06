@@ -23,9 +23,9 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);line-he
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
 @keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
-@keyframes traceDot{to{stroke-dashoffset:-1200}}
-@keyframes traceDotSlow{to{stroke-dashoffset:-1200}}
-@keyframes waveLoop{0%{stroke-dashoffset:2000}50%{stroke-dashoffset:0}100%{stroke-dashoffset:-2000}}
+@keyframes traceDot{to{stroke-dashoffset:-3000}}
+@keyframes traceDotSlow{from{stroke-dashoffset:18}to{stroke-dashoffset:-9999}}
+@keyframes waveLoop{0%{stroke-dashoffset:4000}50%{stroke-dashoffset:0}100%{stroke-dashoffset:-4000}}
 
 .a1{animation:fadeUp .6s ease both}
 .a2{animation:fadeUp .6s ease .15s both}
