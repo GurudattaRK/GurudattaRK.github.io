@@ -34,7 +34,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);line-he
 
 nav{display:flex;justify-content:space-between;align-items:center;max-width:var(--mw);margin:0 auto;padding:2rem var(--s)}
 nav a{color:var(--text);text-decoration:none;font-weight:500;font-size:.95rem}
-nav .links{display:flex;gap:1.5rem}
+nav .links{display:flex;gap:.5rem;align-items:center}
 nav .links a{position:relative}
 nav .links a::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:1px;background:var(--accent);transition:width .3s ease}
 nav .links a:hover::after,nav .links a.active::after{width:100%}
@@ -48,28 +48,24 @@ main{max-width:var(--mw);margin:0 auto;padding:0 var(--s) 4rem}
 .hi{font-size:1rem;color:var(--accent);font-family:var(--font-mono);margin-bottom:.25rem}
 .hero h1{font-size:clamp(2.5rem,5vw,4rem);font-weight:700;letter-spacing:-.02em;line-height:1.1;margin-bottom:.5rem}
 .hero .tagline{font-size:clamp(1rem,2vw,1.25rem);color:var(--muted);margin-bottom:1.5rem}
-.hero .cta{display:none}
 .squircle-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin:2rem 0;max-width:480px;width:100%}
 .squircle{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;padding:1.5rem 1rem;background:var(--surface);border:1px solid var(--border);border-radius:20px;text-decoration:none;color:var(--text);transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease}
 .squircle:hover{transform:translateY(-4px);border-color:var(--accent);box-shadow:0 0 24px var(--accent-dim)}
+.squircle.nav-squircle{padding:.5rem .75rem;border-radius:12px;flex-direction:row;gap:.4rem}
+.squircle.nav-squircle svg{width:18px;height:18px}
+.squircle.nav-squircle span{font-size:.85rem}
+nav .links .squircle::after{display:none}
+.squircle.nav-squircle.active{border-color:var(--accent);box-shadow:0 0 12px var(--accent-dim)}
 .squircle svg{width:28px;height:28px;fill:none;stroke:var(--accent);stroke-width:1.5}
+.squircle svg.bulb{fill:var(--accent);stroke:none}
 .squircle span{font-size:.8rem;font-weight:500}
 .email-row{display:flex;align-items:center;gap:.5rem;margin-top:1.5rem;color:var(--muted);font-size:.9rem}
 .email-row a{color:var(--accent);text-decoration:none}
 .email-row svg{width:18px;height:18px;fill:currentColor}
-.social-row{display:flex;gap:1.5rem;margin-top:1rem}
-.social-row a{color:var(--muted);transition:color .2s ease}
-.social-row a:hover{color:var(--accent)}
-.social-row svg{width:24px;height:24px;fill:currentColor}
 .linkedin-blue{color:var(--linkedin)!important}
 .linkedin-blue:hover{color:#4691d4!important}
 .tagline .norm{color:var(--muted);font-weight:400}
 .tagline .bold{color:var(--text);font-weight:700}
-.btn{display:inline-block;padding:.6rem 1.2rem;border-radius:var(--r);text-decoration:none;font-size:.9rem;font-weight:500;transition:transform .2s ease,box-shadow .2s ease}
-.btn-primary{background:var(--accent);color:var(--bg)}
-.btn-primary:hover{transform:translateY(-2px);box-shadow:0 0 20px rgba(34,211,238,.3)}
-.btn-secondary{border:1px solid var(--border);color:var(--text)}
-.btn-secondary:hover{border-color:var(--accent);box-shadow:0 0 20px var(--accent-dim)}
 
 footer{max-width:var(--mw);margin:0 auto;padding:2rem var(--s);border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:.85rem}
 footer .social{display:flex;gap:1rem}
@@ -78,8 +74,6 @@ footer .social a:hover{color:var(--accent)}
 footer svg{width:18px;height:18px;fill:currentColor}
 
 .circuit-bg{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:-1;opacity:.35}
-.hex-bg{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:-1;opacity:.06}
-.wave-bg{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:-1;opacity:.28}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1.5rem;transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}
 .card:hover{transform:translateY(-4px);border-color:var(--accent);box-shadow:0 12px 40px rgba(34,211,238,.08)}
 .card h2{font-size:1.25rem;font-weight:600;margin-bottom:.5rem}
