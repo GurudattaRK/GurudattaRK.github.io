@@ -1,140 +1,235 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Projects by Gurudatta R K — PicoPerf, TeraCrypt, CUDA Cipher, and more low-latency systems work.">
-<title>Projects — Gurudatta R K</title>
-<link rel="stylesheet" href="style.css">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9A%A1%3C/text%3E%3C/svg%3E">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description"
+    content="Projects by Gurudatta R K — PicoPerf, TeraCrypt, CUDA Cipher, and more low-latency systems work.">
+  <title>Projects — Gurudatta R K</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9A%A1%3C/text%3E%3C/svg%3E">
 </head>
+
 <body>
-<object class="circuit-bg" data="assets/circuit.svg" type="image/svg+xml"></object>
-<nav class="a1">
-  <a href="index.html" class="squircle nav-squircle">
-    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 22V12h6v10" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    <span>Home</span>
-  </a>
-  <div class="links">
-    <a href="projects.html" class="squircle nav-squircle active">
-      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <span>Projects</span>
+  <object class="circuit-bg" data="assets/circuit.svg" type="image/svg+xml"></object>
+  <nav class="a1">
+    <a href="index.html" class="squircle nav-squircle">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M9 22V12h6v10" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+      <span>Home</span>
     </a>
-    <a href="thoughts.html" class="squircle nav-squircle">
-      <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" class="bulb"><path d="M16,7a8.36,8.36,0,0,0-8,8,8.4,8.4,0,0,0,2.29,5.7A4.56,4.56,0,0,1,12,24a1,1,0,0,0,1,1h6a1,1,0,0,0,1-1,4.46,4.46,0,0,1,1.69-3.28A7.87,7.87,0,0,0,24,15a8.17,8.17,0,0,0-2.44-5.83A7.67,7.67,0,0,0,16,7Zm4.34,12.28A6.87,6.87,0,0,0,18.09,23H13.91a7,7,0,0,0-2.2-3.71A6.41,6.41,0,0,1,10,15a6.29,6.29,0,0,1,6-6,5.63,5.63,0,0,1,4.13,1.6A6.16,6.16,0,0,1,22,15,5.93,5.93,0,0,1,20.31,19.28Z"/><path d="M19,26H13a1,1,0,0,0,0,2h6a1,1,0,0,0,0-2Z"/><path d="M18,29H14a1,1,0,0,0,0,2h4a1,1,0,0,0,0-2Z"/><path d="M16,5a1,1,0,0,0,1-1V2a1,1,0,0,0-2,0V4A1,1,0,0,0,16,5Z"/><path d="M5,14H3a1,1,0,0,0,0,2H5a1,1,0,0,0,0-2Z"/><path d="M29,14H27a1,1,0,0,0,0,2h2a1,1,0,0,0,0-2Z"/><path d="M25.9,5.1a1,1,0,0,0-1.41,0L23.07,6.51a1,1,0,0,0,0,1.42,1,1,0,0,0,.71.29,1,1,0,0,0,.71-.29L25.9,6.51A1,1,0,0,0,25.9,5.1Z"/><path d="M8.93,7.93a1,1,0,0,0,0-1.42L7.51,5.1A1,1,0,0,0,6.1,6.51L7.51,7.93a1,1,0,0,0,.71.29A1,1,0,0,0,8.93,7.93Z"/></svg>
-      <span>My thoughts</span>
-    </a>
-    <a href="about.html" class="squircle nav-squircle">
-      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="7" r="4"/></svg>
-      <span>About me</span>
-    </a>
-  </div>
-</nav>
-
-<main>
-  <h1 class="page-title a1">Projects</h1>
-  <p class="page-sub a2">Low-latency tools, assembly engines, and performance experiments.</p>
-
-  <div class="a3" style="display:grid;gap:1.5rem">
-    <article class="card a3">
-      <h2>PicoPerf</h2>
-      <p>Zero-overhead PMU benchmarking library for x86-64 Linux. Captures hardware-native CPU metrics directly from x86-64 registers via perf_event_open — retired instructions, cycles, IPC, cache misses, TLB misses — with nanosecond resolution using RDTSCP.</p>
-      <div class="tags">
-        <span class="tag">C</span>
-        <span class="tag">x86-64 Assembly</span>
-        <span class="tag">Linux</span>
-        <span class="tag">PMU</span>
-        <span class="tag">RDTSC</span>
-      </div>
-      <a href="https://github.com/GurudattaRK/PicoPerf" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:.4rem;margin-top:1rem;color:var(--accent);text-decoration:none;font-size:.85rem">
-        <svg width="14" height="14"><use href="assets/icons.svg#external"/></svg> View on GitHub
+    <div class="links">
+      <a href="projects.html" class="squircle nav-squircle active">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg>
+        <span>Projects</span>
       </a>
-    </article>
-
-    <article class="card a4">
-      <h2>TeraCrypt</h2>
-      <p>Multi-core x86-64 assembly encryption engine compiled as a position-independent shared library. Python frontend distributes file chunks across physical cores with zero synchronization overhead, achieving 450-500% speedup on 6-core machines.</p>
-      <div class="tags">
-        <span class="tag">x86-64 Assembly</span>
-        <span class="tag">Python</span>
-        <span class="tag">Multiprocessing</span>
-        <span class="tag">SIMD</span>
-      </div>
-      <a href="https://github.com/GurudattaRK/TeraCrypt-v2.1" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:.4rem;margin-top:1rem;color:var(--accent);text-decoration:none;font-size:.85rem">
-        <svg width="14" height="14"><use href="assets/icons.svg#external"/></svg> View on GitHub
+      <a href="thoughts.html" class="squircle nav-squircle">
+        <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" class="bulb">
+          <path
+            d="M16,7a8.36,8.36,0,0,0-8,8,8.4,8.4,0,0,0,2.29,5.7A4.56,4.56,0,0,1,12,24a1,1,0,0,0,1,1h6a1,1,0,0,0,1-1,4.46,4.46,0,0,1,1.69-3.28A7.87,7.87,0,0,0,24,15a8.17,8.17,0,0,0-2.44-5.83A7.67,7.67,0,0,0,16,7Zm4.34,12.28A6.87,6.87,0,0,0,18.09,23H13.91a7,7,0,0,0-2.2-3.71A6.41,6.41,0,0,1,10,15a6.29,6.29,0,0,1,6-6,5.63,5.63,0,0,1,4.13,1.6A6.16,6.16,0,0,1,22,15,5.93,5.93,0,0,1,20.31,19.28Z" />
+          <path d="M19,26H13a1,1,0,0,0,0,2h6a1,1,0,0,0,0-2Z" />
+          <path d="M18,29H14a1,1,0,0,0,0,2h4a1,1,0,0,0,0-2Z" />
+          <path d="M16,5a1,1,0,0,0,1-1V2a1,1,0,0,0-2,0V4A1,1,0,0,0,16,5Z" />
+          <path d="M5,14H3a1,1,0,0,0,0,2H5a1,1,0,0,0,0-2Z" />
+          <path d="M29,14H27a1,1,0,0,0,0,2h2a1,1,0,0,0,0-2Z" />
+          <path
+            d="M25.9,5.1a1,1,0,0,0-1.41,0L23.07,6.51a1,1,0,0,0,0,1.42,1,1,0,0,0,.71.29,1,1,0,0,0,.71-.29L25.9,6.51A1,1,0,0,0,25.9,5.1Z" />
+          <path
+            d="M8.93,7.93a1,1,0,0,0,0-1.42L7.51,5.1A1,1,0,0,0,6.1,6.51L7.51,7.93a1,1,0,0,0,.71.29A1,1,0,0,0,8.93,7.93Z" />
+        </svg>
+        <span>My thoughts</span>
       </a>
-    </article>
-
-    <article class="card">
-      <h2>CUDA Cipher</h2>
-      <p>GPU-parallelized encryption kernel for NVIDIA CUDA. Coalesced global memory access with dynamic thread-block tuning at runtime. Benchmarked against CPU baselines to quantify throughput vs latency trade-offs across execution models.</p>
-      <div class="tags">
-        <span class="tag">CUDA</span>
-        <span class="tag">C</span>
-        <span class="tag">GPU</span>
-        <span class="tag">Parallel Computing</span>
-      </div>
-      <a href="https://github.com/GurudattaRK/Project-CUDA" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:.4rem;margin-top:1rem;color:var(--accent);text-decoration:none;font-size:.85rem">
-        <svg width="14" height="14"><use href="assets/icons.svg#external"/></svg> View on GitHub
+      <a href="about.html" class="squircle nav-squircle">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" stroke-linecap="round" stroke-linejoin="round" />
+          <circle cx="12" cy="7" r="4" />
+        </svg>
+        <span>About me</span>
       </a>
-    </article>
+    </div>
+  </nav>
 
-    <article class="card">
-      <h2>C Reference Cipher</h2>
-      <p>Portable C reference implementation of a custom cipher. Hand-optimized for compiler-friendly code generation with LTO, -O3, -ffast-math, and -march=native. Assembly output inspected to verify optimal instruction sequences.</p>
-      <div class="tags">
-        <span class="tag">C</span>
-        <span class="tag">Compiler Optimization</span>
-        <span class="tag">LTO</span>
-        <span class="tag">PGO</span>
-      </div>
-      <a href="https://github.com/GurudattaRK/Bit-level-encryption-v1.0" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:.4rem;margin-top:1rem;color:var(--accent);text-decoration:none;font-size:.85rem">
-        <svg width="14" height="14"><use href="assets/icons.svg#external"/></svg> View on GitHub
+  <main>
+    <h1 class="page-title a1">Projects</h1>
+    <p class="page-sub a2">Low-latency tools, assembly engines, and performance experiments.</p>
+
+    <div class="a3" style="display:grid;gap:1.5rem">
+      <article class="card a3">
+        <h2>Low-Latency-Lab</h2>
+        <p>An initiative to rebuild and optimize my earlier projects with modern high-performance computing
+          techniques. Each project is re-engineered from the ground up with hardware-aware design — CPU cache
+          topology, AVX2 SIMD, async I/O via io_uring, lock-free data structures, PGO compilation, and perf-based
+          profiling. Includes detailed benchmarking with perf stat/record to identify and eliminate bottlenecks at
+          the instruction and cache-line level.</p>
+        <div class="tags">
+          <span class="tag">HPC</span>
+          <span class="tag">Performance Engineering</span>
+          <span class="tag">perf profiling</span>
+          <span class="tag">AVX2</span>
+          <span class="tag">io_uring</span>
+          <span class="tag">PGO</span>
+        </div>
+        <a href="https://github.com/GurudattaRK/Low-Latency-Lab" target="_blank" rel="noopener"
+          style="display:inline-flex;align-items:center;gap:.4rem;margin-top:1rem;color:var(--accent);text-decoration:none;font-size:.85rem">
+          <svg width="14" height="14">
+            <use href="assets/icons.svg#external" />
+          </svg> View on GitHub
+        </a>
+      </article>
+
+      <article class="card a3">
+        <h2>PicoPerf</h2>
+        <p>Zero-overhead PMU benchmarking library for x86-64 Linux. Captures hardware-native CPU metrics directly from
+          x86-64 registers via perf_event_open — retired instructions, cycles, IPC, cache misses, TLB misses — with
+          nanosecond resolution using RDTSCP.</p>
+        <div class="tags">
+          <span class="tag">C</span>
+          <span class="tag">x86-64 Assembly</span>
+          <span class="tag">Linux</span>
+          <span class="tag">PMU</span>
+          <span class="tag">RDTSC</span>
+        </div>
+        <a href="https://github.com/GurudattaRK/PicoPerf" target="_blank" rel="noopener"
+          style="display:inline-flex;align-items:center;gap:.4rem;margin-top:1rem;color:var(--accent);text-decoration:none;font-size:.85rem">
+          <svg width="14" height="14">
+            <use href="assets/icons.svg#external" />
+          </svg> View on GitHub
+        </a>
+      </article>
+
+      <article class="card a4">
+        <h2>TeraCrypt v4.0</h2>
+        <p>Multi-process async encryption pipeline using Linux io_uring for zero-syscall I/O, lock-free Vyukov MPMC
+          queues for cross-process chunk dispatch, AVX2 SIMD for block encryption, and O_DIRECT for zero-copy disk I/O.
+          5 worker processes pinned to physical cores via CPU affinity, with PGO-compiled binaries achieving 1.33 GB/s
+          throughput — a 3.4x scaling over the single-threaded baseline on a 6-core AMD Ryzen 4600H.</p>
+        <div class="tags">
+          <span class="tag">C</span>
+          <span class="tag">io_uring</span>
+          <span class="tag">AVX2 SIMD</span>
+          <span class="tag">Lock-free Queues</span>
+          <span class="tag">O_DIRECT</span>
+          <span class="tag">Multi-process</span>
+          <span class="tag">PGO</span>
+        </div>
+        <a href="https://github.com/GurudattaRK/Low-Latency-Lab" target="_blank" rel="noopener"
+          style="display:inline-flex;align-items:center;gap:.4rem;margin-top:1rem;color:var(--accent);text-decoration:none;font-size:.85rem">
+          <svg width="14" height="14">
+            <use href="assets/icons.svg#external" />
+          </svg> View on GitHub
+        </a>
+        <a href="teracrypt-journey.html"
+          style="display:inline-flex;align-items:center;gap:.4rem;margin-top:.75rem;margin-left:1rem;color:var(--accent);text-decoration:none;font-size:.85rem">
+          Read the build journey &rarr;
+        </a>
+      </article>
+
+      <article class="card">
+        <h2>CUDA Cipher</h2>
+        <p>GPU-parallelized encryption kernel for NVIDIA CUDA. Coalesced global memory access with dynamic thread-block
+          tuning at runtime. Benchmarked against CPU baselines to quantify throughput vs latency trade-offs across
+          execution models.</p>
+        <div class="tags">
+          <span class="tag">CUDA</span>
+          <span class="tag">C</span>
+          <span class="tag">GPU</span>
+          <span class="tag">Parallel Computing</span>
+        </div>
+        <a href="https://github.com/GurudattaRK/Project-CUDA" target="_blank" rel="noopener"
+          style="display:inline-flex;align-items:center;gap:.4rem;margin-top:1rem;color:var(--accent);text-decoration:none;font-size:.85rem">
+          <svg width="14" height="14">
+            <use href="assets/icons.svg#external" />
+          </svg> View on GitHub
+        </a>
+      </article>
+
+      <article class="card">
+        <h2>Bit-Level Encryption — AVX2 Optimized</h2>
+        <p>Single-threaded reference implementation of a custom 128-bit block cipher, hand-optimized with AVX2
+          intrinsics for two-block parallel encryption. PGO-compiled with Clang using -Ofast -flto -march=native. Serves
+          as the single-threaded baseline for benchmarking TeraCrypt v4.0, with verified cross-compatibility — files
+          encrypted by either implementation decrypt correctly with the other.</p>
+        <div class="tags">
+          <span class="tag">C</span>
+          <span class="tag">AVX2 Intrinsics</span>
+          <span class="tag">PGO</span>
+          <span class="tag">LTO</span>
+          <span class="tag">Cryptography</span>
+        </div>
+        <a href="https://github.com/GurudattaRK/Low-Latency-Lab" target="_blank" rel="noopener"
+          style="display:inline-flex;align-items:center;gap:.4rem;margin-top:1rem;color:var(--accent);text-decoration:none;font-size:.85rem">
+          <svg width="14" height="14">
+            <use href="assets/icons.svg#external" />
+          </svg> View on GitHub
+        </a>
+      </article>
+
+      <article class="card">
+        <h2>1024-Bit Assembly Cipher</h2>
+        <p>Full x86-64 assembly rewrite of the C reference cipher for maximum execution speed. The computationally
+          intensive encryption core is written entirely in x64 assembly with register-level control, manual calling
+          conventions, and loop unrolling — compiled for both Linux and Windows.</p>
+        <div class="tags">
+          <span class="tag">x86-64 Assembly</span>
+          <span class="tag">C</span>
+          <span class="tag">Cross-Platform</span>
+        </div>
+        <a href="https://github.com/GurudattaRK/1024-Bit-encryption-v1.1" target="_blank" rel="noopener"
+          style="display:inline-flex;align-items:center;gap:.4rem;margin-top:1rem;color:var(--accent);text-decoration:none;font-size:.85rem">
+          <svg width="14" height="14">
+            <use href="assets/icons.svg#external" />
+          </svg> View on GitHub
+        </a>
+      </article>
+
+      <article class="card">
+        <h2>PQrypt</h2>
+        <p>Cross-platform post-quantum cryptographic application built in Rust with Slint UI. Integrates ML-KEM-1024,
+          HQC-256, SLH-DSA, X448, ChaCha20, AES-256-GCM, and Argon2id for quantum-resistant file encryption and secure
+          messaging. Best Final Year Project 2024.</p>
+        <div class="tags">
+          <span class="tag">Rust</span>
+          <span class="tag">Post-Quantum</span>
+          <span class="tag">Cryptography</span>
+          <span class="tag">Cross-Platform</span>
+        </div>
+        <a href="https://github.com/GurudattaRK/PQrypt" target="_blank" rel="noopener"
+          style="display:inline-flex;align-items:center;gap:.4rem;margin-top:1rem;color:var(--accent);text-decoration:none;font-size:.85rem">
+          <svg width="14" height="14">
+            <use href="assets/icons.svg#external" />
+          </svg> View on GitHub
+        </a>
+      </article>
+    </div>
+  </main>
+
+  <footer>
+    <span>&copy; 2026 Gurudatta R K</span>
+    <div class="social">
+      <a href="https://github.com/GurudattaRK" target="_blank" rel="noopener" aria-label="GitHub">
+        <svg>
+          <use href="assets/icons.svg#github" />
+        </svg>
       </a>
-    </article>
-
-    <article class="card">
-      <h2>1024-Bit Assembly Cipher</h2>
-      <p>Full x86-64 assembly rewrite of the C reference cipher for maximum execution speed. The computationally intensive encryption core is written entirely in x64 assembly with register-level control, manual calling conventions, and loop unrolling — compiled for both Linux and Windows.</p>
-      <div class="tags">
-        <span class="tag">x86-64 Assembly</span>
-        <span class="tag">C</span>
-        <span class="tag">Cross-Platform</span>
-      </div>
-      <a href="https://github.com/GurudattaRK/1024-Bit-encryption-v1.1" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:.4rem;margin-top:1rem;color:var(--accent);text-decoration:none;font-size:.85rem">
-        <svg width="14" height="14"><use href="assets/icons.svg#external"/></svg> View on GitHub
+      <a href="https://www.linkedin.com/in/gurudatta-r-k/" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg>
+          <use href="assets/icons.svg#linkedin" />
+        </svg>
       </a>
-    </article>
-
-    <article class="card">
-      <h2>PQrypt</h2>
-      <p>Cross-platform post-quantum cryptographic application built in Rust with Slint UI. Integrates ML-KEM-1024, HQC-256, SLH-DSA, X448, ChaCha20, AES-256-GCM, and Argon2id for quantum-resistant file encryption and secure messaging. Best Final Year Project 2024.</p>
-      <div class="tags">
-        <span class="tag">Rust</span>
-        <span class="tag">Post-Quantum</span>
-        <span class="tag">Cryptography</span>
-        <span class="tag">Cross-Platform</span>
-      </div>
-      <a href="https://github.com/GurudattaRK/PQrypt" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:.4rem;margin-top:1rem;color:var(--accent);text-decoration:none;font-size:.85rem">
-        <svg width="14" height="14"><use href="assets/icons.svg#external"/></svg> View on GitHub
+      <a href="mailto:gurudatta.kondampallikar@gmail.com" aria-label="Email">
+        <svg>
+          <use href="assets/icons.svg#email" />
+        </svg>
       </a>
-    </article>
-  </div>
-</main>
-
-<footer>
-  <span>&copy; 2026 Gurudatta R K</span>
-  <div class="social">
-    <a href="https://github.com/GurudattaRK" target="_blank" rel="noopener" aria-label="GitHub">
-      <svg><use href="assets/icons.svg#github"/></svg>
-    </a>
-    <a href="https://www.linkedin.com/in/gurudatta-r-k/" target="_blank" rel="noopener" aria-label="LinkedIn">
-      <svg><use href="assets/icons.svg#linkedin"/></svg>
-    </a>
-    <a href="mailto:gurudatta.kondampallikar@gmail.com" aria-label="Email">
-      <svg><use href="assets/icons.svg#email"/></svg>
-    </a>
-  </div>
-</footer>
+    </div>
+  </footer>
 </body>
+
 </html>

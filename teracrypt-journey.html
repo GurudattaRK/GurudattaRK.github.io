@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description"
+    content="Building TeraCrypt v4.0 — a deep dive into io_uring, AVX2, lock-free queues, and the art of wasting CPU cycles. A performance engineering journey.">
+  <title>From 0.61 to 1.33 GB/s — Building TeraCrypt v4.0 — Gurudatta R K</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9A%A1%3C/text%3E%3C/svg%3E">
+</head>
+
+<body>
+  <object class="circuit-bg" data="assets/circuit.svg" type="image/svg+xml"></object>
+  <nav class="a1">
+    <a href="index.html" class="squircle nav-squircle">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M9 22V12h6v10" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+      <span>Home</span>
+    </a>
+    <div class="links">
+      <a href="projects.html" class="squircle nav-squircle">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg>
+        <span>Projects</span>
+      </a>
+      <a href="thoughts.html" class="squircle nav-squircle active">
+        <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" class="bulb">
+          <path
+            d="M16,7a8.36,8.36,0,0,0-8,8,8.4,8.4,0,0,0,2.29,5.7A4.56,4.56,0,0,1,12,24a1,1,0,0,0,1,1h6a1,1,0,0,0,1-1,4.46,4.46,0,0,1,1.69-3.28A7.87,7.87,0,0,0,24,15a8.17,8.17,0,0,0-2.44-5.83A7.67,7.67,0,0,0,16,7Zm4.34,12.28A6.87,6.87,0,0,0,18.09,23H13.91a7,7,0,0,0-2.2-3.71A6.41,6.41,0,0,1,10,15a6.29,6.29,0,0,1,6-6,5.63,5.63,0,0,1,4.13,1.6A6.16,6.16,0,0,1,22,15,5.93,5.93,0,0,1,20.31,19.28Z" />
+          <path d="M19,26H13a1,1,0,0,0,0,2h6a1,1,0,0,0,0-2Z" />
+          <path d="M18,29H14a1,1,0,0,0,0,2h4a1,1,0,0,0,0-2Z" />
+          <path d="M16,5a1,1,0,0,0,1-1V2a1,1,0,0,0-2,0V4A1,1,0,0,0,16,5Z" />
+          <path d="M5,14H3a1,1,0,0,0,0,2H5a1,1,0,0,0,0-2Z" />
+          <path d="M29,14H27a1,1,0,0,0,0,2h2a1,1,0,0,0,0-2Z" />
+          <path
+            d="M25.9,5.1a1,1,0,0,0-1.41,0L23.07,6.51a1,1,0,0,0,0,1.42,1,1,0,0,0,.71.29,1,1,0,0,0,.71-.29L25.9,6.51A1,1,0,0,0,25.9,5.1Z" />
+          <path
+            d="M8.93,7.93a1,1,0,0,0,0-1.42L7.51,5.1A1,1,0,0,0,6.1,6.51L7.51,7.93a1,1,0,0,0,.71.29A1,1,0,0,0,8.93,7.93Z" />
+        </svg>
+        <span>My thoughts</span>
+      </a>
+      <a href="about.html" class="squircle nav-squircle">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" stroke-linecap="round" stroke-linejoin="round" />
+          <circle cx="12" cy="7" r="4" />
+        </svg>
+        <span>About me</span>
+      </a>
+    </div>
+  </nav>
+
+  <main>
+    <div class="blog-header a1">
+      <div class="blog-meta">2025 &middot; 20 min read &middot; Low-Latency-Lab</div>
+      <h1 class="blog-title">From 0.61 to 1.33 GB/s: Building TeraCrypt v4.0</h1>
+      <p class="blog-subtitle">A nerd's journey through io_uring, AVX2 SIMD, lock-free queues, and the art of
+        discovering your own code is wasting half the CPU.</p>
+      <div class="blog-tags">
+        <span class="tag">io_uring</span>
+        <span class="tag">AVX2</span>
+        <span class="tag">Lock-free</span>
+        <span class="tag">O_DIRECT</span>
+        <span class="tag">perf</span>
+        <span class="tag">PGO</span>
+        <span class="tag">Multi-process</span>
+      </div>
+    </div>
+
+    <article class="blog-body a2">
+
+      <p>Look, I need to tell you a story. It's about how I rebuilt my encryption engine from scratch, learned a bunch
+        of things the hard way, and then spent an embarrassing number of hours staring at <code>perf record</code>
+        output at 3am trying to figure out why my "highly optimized" multi-core code was barely 2x faster than
+        single-threaded.</p>
+
+      <p>This is the story of TeraCrypt v4.0 — the version that actually works. Not because I'm some genius who got it
+        right the first time, but because I got it wrong, measured it, and then fixed it. One painful, exciting,
+        obsessive bottleneck at a time.</p>
+
+      <div class="section-break">* * *</div>
+
+      <h2>The Itch</h2>
+
+      <p>A few years ago, I wrote <a href="https://github.com/GurudattaRK/Bit-level-encryption-v1.0" target="_blank"
+          rel="noopener">Bit-level-encryption-v1.0</a> — a custom cipher in C. It was my first real attempt at
+        "optimization." I thought <code>-O3</code> was aggressive. I thought checking the assembly output to make sure
+        the compiler was doing the right thing was peak performance engineering. I was naive, but I was enthusiastic,
+        and honestly? That enthusiasm was the most important part.</p>
+
+      <p>Then I built <a href="https://github.com/GurudattaRK/TeraCrypt-v2.1" target="_blank" rel="noopener">TeraCrypt
+          v2.1</a> — a Python frontend that distributed file chunks across cores using a C shared library with inline
+        assembly. It worked. It was faster. But it was also... kind of a hack. Python was doing the orchestration, which
+        meant GIL contention, serialization overhead, and a lot of glue code that had no business being in a
+        performance-critical pipeline.</p>
+
+      <p>Over the years, I learned a lot. CPU architecture. Cache hierarchies. How branch prediction actually works.
+        What the memory bus does when 5 cores all try to CAS the same cache line. I read about io_uring and thought
+        "holy crap, this changes everything." I'd known about SIMD for years but never used it <em>this</em>
+        extensively. I knew about async I/O in theory but had never built something that combined async I/O with a
+        multi-process worker pool.</p>
+
+      <p>So I decided to rebuild everything. From scratch. In pure C. No Python glue. No training wheels. Just me, the
+        hardware, and a compiler.</p>
+
+      <p>I called it <a href="https://github.com/GurudattaRK/Low-Latency-Lab" target="_blank"
+          rel="noopener">Low-Latency-Lab</a> — a place to experiment, learn, and optimize the shit out of my older
+        projects with everything I now knew about how the hardware actually works.</p>
+
+      <div class="section-break">* * *</div>
+
+      <h2>Threads vs Processes: The First Experiment</h2>
+
+      <p>Before I wrote a single line of the pipeline, I had a decision to make: threads or processes?</p>
+
+      <p>Everyone says threads are lighter weight. Everyone says shared address space is a feature. But here's the thing
+        — I'd been burned by the GIL in Python, and I'd read enough about false sharing and cache line ping-pong to be
+        suspicious. I wanted to <em>measure</em> it, not just trust conventional wisdom.</p>
+
+      <p>So I built two prototypes. Same crypto core, same chunk size, same I/O pattern. One used <code>pthreads</code>
+        with a shared buffer pool, the other used <code>fork()</code> with shared memory (<code>mmap</code> +
+        <code>MAP_SHARED</code>) for the data buffers and key tables, and lock-free queues for communication.
+      </p>
+
+      <p>The results were... interesting. The process version was faster. Not by a little — by a meaningful margin. And
+        the more workers I added, the bigger the gap got.</p>
+
+      <div class="callout">
+        <div class="callout-title">Why processes won</div>
+        <p>With threads, every worker shares the same address space. That sounds good until you realize that the OS
+          scheduler can preempt a thread mid-encryption, and when it resumes, it might be on a different core with a
+          cold L1/L2 cache. With processes pinned to specific cores via <code>sched_setaffinity</code>, each worker owns
+          its core. No preemption surprises. No cache migrations. The OS scheduler has less to manage because each
+          process is pinned.</p>
+        <p>Also: shared memory via <code>mmap</code> with <code>MAP_SHARED</code> gives you the same zero-copy buffer
+          sharing as threads, but with <em>explicit</em> control over what's shared. The key tables and chunk buffers
+          are shared. The queues are shared. Everything else is private. No accidental false sharing from stack
+          variables or compiler-generated temporaries landing on the same cache line.</p>
+      </div>
+
+      <p>That was lesson number one: <strong>measure, don't assume</strong>. Conventional wisdom said threads. The
+        hardware said processes. I listened to the hardware.</p>
+
+      <div class="section-break">* * *</div>
+
+      <h2>Falling Down the io_uring Rabbit Hole</h2>
+
+      <p>Okay, this is where things get fun. I'd been reading about <code>io_uring</code> for months — Jens Axboe's new
+        async I/O interface for Linux that was supposed to make <code>epoll</code> and <code>aio</code> look like toys.
+        The pitch was seductive: submit I/O requests to a ring buffer shared between userspace and the kernel, and the
+        kernel processes them asynchronously. No syscalls per request. No copying. Just a memory-mapped ring buffer and
+        a handshake.</p>
+
+      <p>I'd used <code>read()</code> and <code>write()</code> my entire career. Blocking I/O. Simple. Easy. And for a
+        single-threaded program, totally fine. But I was building a pipeline now — one process reading chunks, 5
+        processes encrypting them, one process writing them back. If the parent blocks on <code>read()</code>, the
+        workers starve. If the parent blocks on <code>write()</code>, the pipeline stalls.</p>
+
+      <p>The old TeraCrypt v2.1 solved this with Python's <code>multiprocessing</code> and thread pools. It worked, but
+        it was layers of abstraction on top of abstraction. I wanted to get closer to the metal.</p>
+
+      <p>So I went all in on <code>io_uring</code>. And let me tell you — the first time you set up a ring buffer,
+        submit a read request, and get a completion notification without a single syscall in the hot path... it feels
+        like magic. You're talking to the kernel through shared memory. You're literally writing to a ring buffer in
+        your process's address space and the kernel is reading from it. No <code>read()</code> syscall. No
+        <code>write()</code> syscall. Just <code>io_uring_submit</code> to flush the submission queue tail pointer, and
+        <code>io_uring_peek_cqe</code> to check for completions.
+      </p>
+
+      <pre><code>// The hot loop: submit reads, drain completions, feed workers
+while (inflight_reads &lt; MAX_INFLIGHT_READS &amp;&amp; free_count &gt; 0) {
+    struct io_uring_sqe* sqe = io_uring_get_sqe(&amp;uring);
+    io_uring_prep_read(sqe, fd_in, slot-&gt;buf, CHUNK_SIZE, offset);
+    io_uring_sqe_set_data(sqe, (void*)(uintptr_t)pack_ud(OP_READ, slot_idx));
+    inflight_reads++;
+}
+io_uring_submit(&amp;uring);
+ 
+// Later: check for completions
+struct io_uring_cqe* cqe;
+while (io_uring_peek_cqe(&amp;uring, &amp;cqe) == 0) {
+    // cqe-&gt;res has the result, cqe-&gt;user_data has our slot index
+    // Feed the completed chunk to a worker via the read_queue
+    io_uring_cqe_seen(&amp;uring, cqe);
+}</code></pre>
+
+      <p>The architecture I ended up with was a proper async pipeline:</p>
+
+      <ul>
+        <li><strong>Parent process</strong> (core 0): Manages <code>io_uring</code>, submits reads, drains completions,
+          dispatches ready chunks to workers via a lock-free queue, collects processed chunks from workers, submits
+          writes</li>
+        <li><strong>5 worker processes</strong> (cores 2, 4, 6, 8, 10): Each spins on a lock-free queue, grabs a chunk,
+          encrypts it with AVX2, pushes it to the write queue</li>
+        <li><strong>Lock-free MPMC queues</strong>: Vyukov bounded multi-producer multi-consumer queue. No locks. No
+          mutexes. Just atomic CAS operations on a circular buffer.</li>
+        <li><strong>Shared memory</strong>: Key tables and chunk buffers are in <code>mmap</code>'d shared memory. Zero
+          copy. Workers read directly from the buffer the kernel DMA'd into.</li>
+      </ul>
+
+      <p>16 reads in flight. 16 writes in flight. 37 chunk slots (5 workers + 16 read + 16 write). 296 MiB of buffer
+        pool. This thing was <em>designed</em>.</p>
+
+      <div class="nerd-note">Side note: the Vyukov MPMC queue is a beautiful piece of work. Each cell in the circular
+        buffer has a sequence number. Producers and consumers use atomic CAS on the enqueue/dequeue positions, but the
+        sequence number tells you whether the cell is valid for your operation — no locks needed. It's the kind of data
+        structure that makes you appreciate how much thought goes into lock-free programming.</div>
+
+      <div class="section-break">* * *</div>
+
+      <h2>AVX2: My First Real SIMD Deep Dive</h2>
+
+      <p>I'd known about SIMD for years. I'd written a few <code>_mm_add_epi32</code> calls here and there. But I'd
+        never designed a crypto core <em>around</em> SIMD from the ground up. This time, I did.</p>
+
+      <p>The cipher operates on 128-byte blocks — 32 <code>uint32_t</code> words. Each round does bitwise rotations,
+        XORs, and byte-level transpositions. In scalar code, each rotation is a <code>rol</code> instruction, each XOR
+        is a <code>xor</code>, and the transpose is a nightmare of shifts and masks.</p>
+
+      <p>But with AVX2, a 256-bit YMM register holds 8 <code>uint32_t</code> values. So I can do 8 rotations in one
+        instruction, 8 XORs in one instruction. The transpose — which is the most expensive part — becomes a series of
+        <code>_mm256_shuffle_epi8</code> and <code>_mm256_unpacklo/hi_epi8</code> calls that handle 8 bytes at a time
+        across 4 registers.
+      </p>
+
+      <p>And here's the trick that I'm most proud of: <strong>two-block parallel encryption</strong>. Instead of
+        encrypting one 128-byte block at a time, I encrypt <em>two</em> blocks simultaneously using different AVX2
+        lanes. The key tables are the same for both blocks, so I load them once and apply them to two different data
+        registers. This doubles the instruction-level parallelism without doubling the key table loads.</p>
+
+      <pre><code>// Two blocks in parallel: same key tables, different data
+__m256i k0 = _mm256_loadu_ps((__m256i*)&amp;key_tables-&gt;round0[0]);
+__m256i b0_a = _mm256_loadu_ps((__m256i*)(block_a + 0));   // block A, words 0-7
+__m256i b0_b = _mm256_loadu_ps((__m256i*)(block_b + 0));   // block B, words 0-7
+b0_a = _mm256_xor_ps(b0_a, k0);  // XOR both with same key
+b0_b = _mm256_xor_ps(b0_b, k0);
+// ... rotations, transpositions, all applied to both blocks
+// ... using the same key table loads</code></pre>
+
+      <p>The single-threaded version of this cipher hits 0.39 GB/s on my Ryzen 5 4600H at 4.0 GHz. That's ~24
+        instructions per byte, with an IPC of ~2.4. Not bad for a custom cipher. But 0.39 GB/s on a single core means
+        the theoretical 5x scaling would give me ~1.96 GB/s. That was the target.</p>
+
+      <div class="section-break">* * *</div>
+
+      <h2>The First Benchmark: A Reality Check</h2>
+
+      <p>I built it. I PGO-compiled it. I dropped caches. I ran it on a 4GB file.</p>
+
+      <div class="benchmark">
+        <div class="benchmark-title">First Benchmark — 4GB File, 6 Cores, PGO</div>
+        <div class="bench-row">
+          <span class="bench-label">Single-threaded encrypt</span>
+          <span class="bench-value">0.30 GB/s <span class="bench-delta">(11.3s)</span></span>
+        </div>
+        <div class="bench-row">
+          <span class="bench-label">Multi-threaded encrypt</span>
+          <span class="bench-value">0.61 GB/s <span class="bench-delta">(7.0s)</span></span>
+        </div>
+        <div class="bench-row">
+          <span class="bench-label">Scaling</span>
+          <span class="bench-value">2.1x <span class="bench-delta bench-down">(on 5 workers!)</span></span>
+        </div>
+      </div>
+
+      <p><strong>2.1x. On 5 workers. That's 42% efficiency.</strong></p>
+
+      <p>I stared at that number for a long time. I'd built this elaborate async pipeline with io_uring and lock-free
+        queues and shared memory and CPU pinning and PGO and AVX2... and I got 2.1x. My old Python-based TeraCrypt v2.1
+        got similar numbers. All that engineering for basically nothing?</p>
+
+      <p>Something was deeply wrong. And I needed to find out what.</p>
+
+      <div class="section-break">* * *</div>
+
+      <h2>perf record: The Detective Story</h2>
+
+      <p>This is where the real fun started. I fired up <code>perf</code> and went full detective mode.</p>
+
+      <pre><code>sudo perf record -F 999 -g --call-graph dwarf \
+  -o teracrypt_enc.data \
+  ./teracrypt encrypt 4.data 4.enc test.key
+ 
+sudo perf report --children
+sudo perf script
+sudo perf annotate</code></pre>
+
+      <p>The first thing <code>perf stat</code> told me was that the CPU frequency was dropping under all-core load. My
+        Ryzen 4600H has a base clock of 3.0 GHz and boosts to 4.0 GHz on single-core. But with all 6 cores loaded, it
+        was dropping to ~2.4 GHz. That's a 40% frequency penalty. On battery. (More on this later — plugging in the
+        power cable changed everything.)</p>
+
+      <p>But frequency alone didn't explain 2.1x. Even at 2.4 GHz, I should've been getting at least 3x. Something else
+        was eating my performance.</p>
+
+      <p>Then I looked at the instruction count.</p>
+
+      <div class="benchmark">
+        <div class="benchmark-title">perf stat — Instruction Analysis</div>
+        <div class="bench-row">
+          <span class="bench-label">Single-threaded instructions</span>
+          <span class="bench-value">76.6 billion</span>
+        </div>
+        <div class="bench-row">
+          <span class="bench-label">Multi-threaded instructions</span>
+          <span class="bench-value">199.6 billion</span>
+        </div>
+        <div class="bench-row">
+          <span class="bench-label">Extra instructions</span>
+          <span class="bench-value">123 billion <span class="bench-delta bench-down">(+161%)</span></span>
+        </div>
+      </div>
+
+      <p><strong>123 billion extra instructions.</strong> The single-threaded version needed 76.6 billion instructions
+        to encrypt 4GB. The multi-threaded version needed 199.6 billion. That's 2.6x more instructions for the same
+        work. My workers were executing 123 billion instructions that did absolutely nothing useful.</p>
+
+      <p>Where were they going? <code>perf annotate</code> gave me the answer: <strong>spin loops</strong>.</p>
+
+      <div class="section-break">* * *</div>
+
+      <h2>Fix #1: The Spin Loop That Ate My CPU</h2>
+
+      <p>Here's what the worker loop looked like:</p>
+
+      <pre><code>for (;;) {
+    uint32_t slot_idx;
+    if (mpmc_queue_pop(w-&gt;read_queue, &amp;slot_idx)) {
+        // Got work — encrypt the chunk
+        process_region(s-&gt;buf, s-&gt;padded_size, w-&gt;mode, w-&gt;key_tables);
+        while (!mpmc_queue_push(w-&gt;write_queue, slot_idx)) { }
+    }
+    // Queue empty? Immediately try again. And again. And again.
+    // At ~1 billion times per second. Per worker. 5 workers.
+    // That's 5 billion CAS attempts per second on the same cache line.
+}</code></pre>
+
+      <p>When the queue was empty, the worker would immediately retry. No sleep, no backoff, no pause. Just a tight loop
+        hammering <code>atomic_compare_exchange_weak</code> on the dequeue position. Each retry is a CAS instruction,
+        which is ~10-20 cycles, plus a cache line bounce if another core has it.</p>
+
+      <p>5 workers doing this simultaneously on the same queue's <code>dequeue_pos</code> cache line = <strong>cache
+          line ping-pong from hell</strong>. Every CAS from one worker invalidates the cache line on all other cores.
+        They all retry, all miss, all bounce the line again. It's a thundering herd on a lock-free data structure.</p>
+
+      <p>The fix was almost insultingly simple: one instruction.</p>
+
+      <pre><code>} else {
+    // Queue empty? Pause. One instruction. ~10 cycles.
+    // Drops the retry rate by ~10x. Cuts wasted instructions
+    // and memory-bus traffic dramatically.
+    __builtin_ia32_pause();
+}</code></pre>
+
+      <p><code>__builtin_ia32_pause()</code> emits a single <code>PAUSE</code> instruction. On Intel, it's a hint to the
+        CPU that you're in a spin loop — it reduces power consumption and lets the other hyperthread (if any) use the
+        execution resources. On AMD Zen, it's a ~10 cycle delay instead of the ~1 cycle a tight spin would take. That's
+        10x fewer CAS attempts per second. 10x less cache line contention. 10x less memory bus traffic.</p>
+
+      <p>I also applied the same fix to the parent process. The parent was busy-waiting on
+        <code>io_uring_peek_cqe</code> — continuously polling for completions even when nothing had happened. And it was
+        calling <code>io_uring_submit</code> on every iteration, even when no new SQEs had been added.
+      </p>
+
+      <pre><code>// Parent: only submit when we actually added SQEs
+if (new_sqes)
+    io_uring_submit(&amp;uring);
+ 
+// Parent: pause when nothing happened this iteration
+if (!got_cqe &amp;&amp; !new_sqes)
+    __builtin_ia32_pause();</code></pre>
+
+      <div class="benchmark">
+        <div class="benchmark-title">After Fix #1 — Pause Backoff</div>
+        <div class="bench-row">
+          <span class="bench-label">Throughput</span>
+          <span class="bench-value">0.66 GB/s <span class="bench-delta bench-up">(+8%)</span></span>
+        </div>
+        <div class="bench-row">
+          <span class="bench-label">Instructions executed</span>
+          <span class="bench-value">103.1 billion <span class="bench-delta bench-up">(-48%)</span></span>
+        </div>
+        <div class="bench-row">
+          <span class="bench-label">Context switches</span>
+          <span class="bench-value">38,409 <span class="bench-delta bench-up">(-26%)</span></span>
+        </div>
+      </div>
+
+      <p>48% fewer instructions. The workers were no longer burning billions of CAS operations on empty queues. But
+        throughput only went up 8% — because the remaining bottleneck was still there, hiding behind the spin loops.</p>
+
+      <div class="section-break">* * *</div>
+
+      <h2>Fix #2: SQPOLL — The "Optimization" That Wasn't</h2>
+
+      <p>This is the one that hurt.</p>
+
+      <p>When I set up <code>io_uring</code>, I used <code>IORING_SETUP_SQPOLL</code> — the kernel's "submit queue
+        polling" mode. The idea is beautiful: instead of the userspace process calling <code>io_uring_submit()</code>
+        (which does a <code>io_uring_enter</code> syscall), a kernel thread continuously polls the submission queue.
+        Zero syscalls for submissions. The kernel thread just watches the ring buffer and processes SQEs as they appear.
+      </p>
+
+      <p>I also pinned this kernel thread to core 0 with <code>IORING_SETUP_SQ_AFF</code>. Same core as the parent
+        process. SMT was disabled on my machine (cores 1, 3, 5, 7, 9, 11 were offline), so there was no hyperthread to
+        share with.</p>
+
+      <p>Can you see the problem yet? Because I didn't. Not for a long time.</p>
+
+      <p>The SQPOLL kernel thread and the parent process were <strong>both pinned to core 0</strong>. They were
+        time-slicing that core via context switches. Every time the kernel thread wanted to check the submission ring,
+        it preempted the parent. Every time the parent wanted to drain completions, it preempted the kernel thread. Back
+        and forth. Thousands of times per second.</p>
+
+      <div class="benchmark">
+        <div class="benchmark-title">The Smoking Gun — Context Switches with SQPOLL</div>
+        <div class="bench-row">
+          <span class="bench-label">Context switches (with SQPOLL)</span>
+          <span class="bench-value">46,797</span>
+        </div>
+        <div class="bench-row">
+          <span class="bench-label">Context switches (without SQPOLL)</span>
+          <span class="bench-value">15,813 <span class="bench-delta bench-up">(-66%)</span></span>
+        </div>
+        <div class="bench-row">
+          <span class="bench-label">task-clock (with SQPOLL)</span>
+          <span class="bench-value">29,588 ms</span>
+        </div>
+        <div class="bench-row">
+          <span class="bench-label">task-clock (without SQPOLL)</span>
+          <span class="bench-value">17,651 ms <span class="bench-delta bench-up">(-40%)</span></span>
+        </div>
+      </div>
+
+      <p>The SQPOLL kernel thread was stealing ~40% of core 0's time spinning on an often-empty submission ring. The
+        parent was fighting it for the remaining 60%. They were actively <em>hurting</em> each other.</p>
+
+      <p>The fix? Remove SQPOLL entirely. Just use regular <code>io_uring</code> with explicit
+        <code>io_uring_submit()</code> calls. Yes, that means a syscall per submission batch. But
+        <code>io_uring_enter</code> is cheap (~1-2 microseconds), and we only call it when we actually have SQEs to
+        submit. The parent gets 100% of core 0. No fighting. No context switches.
+      </p>
+
+      <div class="benchmark">
+        <div class="benchmark-title">After Fix #2 — Removing SQPOLL</div>
+        <div class="bench-row">
+          <span class="bench-label">Throughput</span>
+          <span class="bench-value">0.97 GB/s <span class="bench-delta bench-up">(+47%)</span></span>
+        </div>
+        <div class="bench-row">
+          <span class="bench-label">Scaling</span>
+          <span class="bench-value">2.5x <span class="bench-delta bench-up">(was 2.1x)</span></span>
+        </div>
+      </div>
+
+      <p>From 0.66 to 0.97 GB/s. Nearly 50% improvement. From removing a single flag.</p>
+
+      <p>I'd spent hours reading about SQPOLL, thinking it was the smart choice. I'd specifically added it to avoid the
+        <code>io_uring_enter</code> syscall. And it was the single biggest performance killer in the entire pipeline.
+        The "optimization" was doing the opposite of optimizing.</p>
+
+      <p>Lesson number two: <strong>every "optimization" is a hypothesis until you measure it</strong>. SQPOLL sounded
+        great in theory. In practice, on a 6-core machine with no SMT, it was a disaster. On a big server with 32 cores
+        and lots of submissions, it might be perfect. Context matters. Measure everything.</p>
+
+      <div class="section-break">* * *</div>
+
+      <h2>Fix #3: O_DIRECT for Reads — Killing the Page Cache</h2>
+
+      <p>At this point I was at 0.97 GB/s. Better, but still only 2.5x scaling on 5 workers. I was running out of
+        obvious things to fix. So I went back to <code>perf stat</code> and looked at the cache numbers.</p>
+
+      <div class="benchmark">
+        <div class="benchmark-title">perf stat — Cache Analysis (Buffered Reads)</div>
+        <div class="bench-row">
+          <span class="bench-label">L1D misses</span>
+          <span class="bench-value">330 million</span>
+        </div>
+        <div class="bench-row">
+          <span class="bench-label">Cache misses (L2/L3)</span>
+          <span class="bench-value">103 million</span>
+        </div>
+        <div class="bench-row">
+          <span class="bench-label">sys time</span>
+          <span class="bench-value">3.65s</span>
+        </div>
+      </div>
+
+      <p>330 million L1D misses. 103 million L2/L3 misses. 3.65 seconds of <code>sys</code> time. That's a lot of kernel
+        work for a program that's supposed to be CPU-bound on encryption.</p>
+
+      <p>And then it hit me. <strong>My reads were buffered. My writes were O_DIRECT.</strong></p>
+
+      <p>I'd already added <code>O_DIRECT</code> to the output file to bypass the page cache for writes. But the input
+        file? Still going through <code>open(fd_in, O_RDONLY)</code>. Every <code>pread</code> was going: disk → kernel
+        page cache → user buffer. That's an extra copy. Extra kernel bookkeeping for readahead. Extra cache pollution —
+        the page cache was filling up with 4GB of file data that I was only going to read once and never touch again.
+      </p>
+
+      <p>And I was even calling <code>posix_fadvise(fd_in, ..., POSIX_FADV_DONTNEED)</code> after each read to tell the
+        kernel "hey, drop this from the page cache." But each <code>posix_fadvise</code> is <em>another syscall</em>. I
+        was paying for the page cache entry, then paying again to evict it. Two syscalls per chunk instead of zero.</p>
+
+      <p>The fix: add <code>O_DIRECT</code> to the input file too.</p>
+
+      <pre><code>int fd_in = open(input_file, O_RDONLY | O_DIRECT);
+int using_direct_read = 1;
+if (fd_in &lt; 0) {
+    using_direct_read = 0;
+    fd_in = open(input_file, O_RDONLY);  // fallback
+}
+
+// ... later, only call posix_fadvise if NOT using O_DIRECT
+// (O_DIRECT bypasses page cache entirely — no need to evict)
+if (!using_direct_read)
+    posix_fadvise(fd_in, offset, CHUNK_SIZE, POSIX_FADV_DONTNEED);</code></pre>
+
+      <p>With <code>O_DIRECT</code>, the kernel DMA's directly into the user buffer. No intermediate page cache copy. No
+        readahead bookkeeping. No <code>posix_fadvise</code> calls. The buffer just needs to be 4096-byte aligned (which
+        it already was — I'd set up the chunk pool with <code>posix_memalign</code> and huge pages from the start).</p>
+
+      <div class="benchmark">
+        <div class="benchmark-title">After Fix #3 — O_DIRECT Reads</div>
+        <div class="bench-row">
+          <span class="bench-label">Throughput</span>
+          <span class="bench-value">1.33 GB/s <span class="bench-delta bench-up">(+37%)</span></span>
+        </div>
+        <div class="bench-row">
+          <span class="bench-label">sys time</span>
+          <span class="bench-value">0.68s <span class="bench-delta bench-up">(-81%)</span></span>
+        </div>
+        <div class="bench-row">
+          <span class="bench-label">L1D misses</span>
+          <span class="bench-value">104 million <span class="bench-delta bench-up">(-68%)</span></span>
+        </div>
+        <div class="bench-row">
+          <span class="bench-label">Cache misses (L2/L3)</span>
+          <span class="bench-value">36 million <span class="bench-delta bench-up">(-65%)</span></span>
+        </div>
+        <div class="bench-row">
+          <span class="bench-label">task-clock</span>
+          <span class="bench-value">13,000 ms <span class="bench-delta bench-up">(-27%)</span></span>
+        </div>
+      </div>
+
+      <p>From 0.97 to 1.33 GB/s. <strong>5x less kernel time. 3x fewer cache misses.</strong> The page cache was
+        silently eating 37% of my throughput, and I'd been compensating for it with <code>posix_fadvise</code> calls
+        that were just adding more overhead on top.</p>
+
+      <p>Lesson number three: <strong>the page cache is not your friend for streaming workloads</strong>. If you're
+        reading a file once, sequentially, and never touching it again, the page cache is just an expensive copy
+        machine. <code>O_DIRECT</code> eliminates the middleman.</p>
+
+      <div class="section-break">* * *</div>
+
+      <h2>The Power Cable Discovery</h2>
+
+      <p>Okay, this one's embarrassing but important. Remember how I mentioned the CPU frequency was dropping under
+        all-core load? I was benchmarking on battery. My laptop was quietly throttling the CPU to prevent battery drain.
+        All-core boost was capped at ~2.4 GHz instead of the 3.8-4.0 GHz it could do on single-core.</p>
+
+      <p>When I finally plugged in the power cable, the single-threaded baseline jumped from 0.30 GB/s to 0.39 GB/s. The
+        multi-threaded version jumped from 1.33 to... well, it also improved because the workers were now running at
+        higher frequencies too.</p>
+
+      <p>This is a critical lesson for anyone benchmarking on a laptop: <strong>your power profile is part of your
+          benchmark</strong>. A 30% frequency difference changes everything. Always benchmark on AC power with the
+        performance governor (<code>cpupower frequency-set -g performance</code>), and always note the power state in
+        your results.</p>
+
+      <div class="section-break">* * *</div>
+
+      <h2>The SPMC/MPSC Question: When Specialization Doesn't Help</h2>
+
+      <p>After all the fixes, I asked another AI to review my code. It pointed out something clever: my
+        <code>read_queue</code> has exactly one producer (the parent) and N consumers (the workers) — that's SPMC. My
+        <code>write_queue</code> has N producers (the workers) and one consumer (the parent) — that's MPSC. The reviewer
+        suggested I could use specialized SPMC/MPSC queues instead of the general Vyukov MPMC queue, which would be
+        cheaper and reduce contention.</p>
+
+      <p>It's a smart observation. But when I actually thought about it carefully, I realized it wouldn't help. Here's
+        why:</p>
+
+      <p>For the <code>read_queue</code> (SPMC): a specialized SPMC queue would eliminate the CAS on the
+        <em>producer</em> side (the parent's push). The parent could use a simple store instead of an atomic CAS. But
+        the <em>consumer</em> side — where 5 workers are competing to pop — would still need CAS. That's where the
+        contention actually is. The producer side has zero contention because there's only one producer.</p>
+
+      <p>For the <code>write_queue</code> (MPSC): a specialized MPSC queue would eliminate the CAS on the
+        <em>consumer</em> side (the parent's pop). The parent could use a simple load. But the <em>producer</em> side —
+        where 5 workers are competing to push — would still need CAS. Again, that's where the contention lives.</p>
+
+      <p>The total savings would be ~1024 CAS operations on the parent (512 pushes + 512 pops). At ~15 cycles per CAS,
+        that's ~15,000 cycles. About 4 microseconds. Out of a 3.26-second runtime. That's 0.0001%.</p>
+
+      <p>The worker-side contention — the part that actually matters — is completely unchanged by SPMC/MPSC
+        specialization. The workers still need CAS because they're competing with each other. Specialized queues don't
+        help when the contention is on the multi-access side.</p>
+
+      <div class="callout">
+        <div class="callout-title">The takeaway</div>
+        <p>Specialized queue types are cheaper <em>in theory</em>, but you need to look at where the contention actually
+          is. In my pipeline, the single-producer/single-consumer sides had zero contention to begin with. The
+          multi-access sides — which are the expensive ones — are identical whether you use MPMC or SPMC/MPSC. The
+          general Vyukov MPMC queue was already fine.</p>
+      </div>
+
+      <p>Lesson number four: <strong>understand where the contention actually is before optimizing</strong>. A queue
+        type that's theoretically cheaper can be practically identical if the cheap side wasn't the bottleneck.</p>
+
+      <div class="section-break">* * *</div>
+
+      <h2>PGO: The Invisible Optimization</h2>
+
+      <p>I should mention PGO — Profile-Guided Optimization — because it's been quietly doing heavy lifting this entire
+        time.</p>
+
+      <p>With PGO, you compile your code in three phases: first, instrument the binary with profiling counters. Second,
+        run it on representative data to collect a profile. Third, recompile using that profile to guide branch
+        prediction, inlining, and code layout decisions.</p>
+
+      <pre><code># Phase 1: Instrument
+clang -fprofile-instr-generate -fcoverage-mapping \
+      -Ofast -flto -march=native main.c -o teracrypt_pgo
+
+# Phase 2: Run on representative data
+./teracrypt_pgo encrypt 4.data /dev/null test.key
+# This generates .profraw files
+
+# Phase 3: Merge profile and recompile
+llvm-profdata merge -o merged.profdata *.profraw
+clang -fprofile-instr-use=merged.profdata \
+      -Ofast -flto -march=native main.c -o teracrypt</code></pre>
+
+      <p>The compiler learns which branches are hot, which paths are taken most often, and how to lay out the code to
+        minimize instruction cache misses. For a crypto core with tight loops and predictable branch patterns, PGO gives
+        a meaningful boost — the compiler can inline aggressively where it matters and keep cold paths out of the hot
+        code's instruction cache lines.</p>
+
+      <p>I PGO-compiled after every single change. Each fix got its own fresh profile. This wasn't just about getting
+        the best binary — it was about making sure I was measuring the <em>real</em> impact of each change, not a stale
+        profile's guess.</p>
+
+      <div class="section-break">* * *</div>
+
+      <h2>The Full Journey</h2>
+
+      <p>Here's the complete optimization timeline. Every number is a cold run on a 4GB file, caches dropped,
+        PGO-compiled, on AC power with the performance governor.</p>
+
+      <div class="benchmark">
+        <div class="benchmark-title">Complete Optimization Timeline</div>
+        <div class="bench-row">
+          <span class="bench-label">Original (SQPOLL + busy-spin)</span>
+          <span class="bench-value">0.61 GB/s <span class="bench-delta">(1.6x)</span></span>
+        </div>
+        <div class="bench-row">
+          <span class="bench-label">+ PAUSE backoff in spin loops</span>
+          <span class="bench-value">0.66 GB/s <span class="bench-delta bench-up">(+8%)</span></span>
+        </div>
+        <div class="bench-row">
+          <span class="bench-label">- SQPOLL removed</span>
+          <span class="bench-value">0.97 GB/s <span class="bench-delta bench-up">(+47%)</span></span>
+        </div>
+        <div class="bench-row">
+          <span class="bench-label">+ O_DIRECT reads</span>
+          <span class="bench-value">1.33 GB/s <span class="bench-delta bench-up">(+37%)</span></span>
+        </div>
+        <div class="bench-row">
+          <span class="bench-label">Total improvement</span>
+          <span class="bench-value">+118%</span>
+        </div>
+      </div>
+
+      <div class="benchmark">
+        <div class="benchmark-title">Final Results — 4GB File, 6 Cores, AC Power</div>
+        <div class="bench-row">
+          <span class="bench-label">Single-threaded encrypt</span>
+          <span class="bench-value">0.39 GB/s <span class="bench-delta">(10.95s)</span></span>
+        </div>
+        <div class="bench-row">
+          <span class="bench-label">Multi-threaded encrypt</span>
+          <span class="bench-value">1.33 GB/s <span class="bench-delta">(3.01s)</span></span>
+        </div>
+        <div class="bench-row">
+          <span class="bench-label">Multi-threaded decrypt</span>
+          <span class="bench-value">1.23 GB/s <span class="bench-delta">(3.24s)</span></span>
+        </div>
+        <div class="bench-row">
+          <span class="bench-label">Encrypt scaling</span>
+          <span class="bench-value">3.4x <span class="bench-delta">(68% of ideal 5x)</span></span>
+        </div>
+        <div class="bench-row">
+          <span class="bench-label">Decrypt scaling</span>
+          <span class="bench-value">3.2x <span class="bench-delta">(63% of ideal 5x)</span></span>
+        </div>
+      </div>
+
+      <p>3.4x on 5 workers. 68% of theoretical linear scaling. Is that good? For a streaming I/O workload on a 6-core
+        laptop with a shared L3 cache and a single NVMe drive? Yeah, I think it's pretty damn good.</p>
+
+      <p>The remaining gap to 5x isn't a bug — it's physics:</p>
+
+      <ul>
+        <li><strong>Parent core does no crypto</strong>: Core 0 is dedicated to I/O management. That caps theoretical
+          scaling at 5/6 = 83% even with zero overhead.</li>
+        <li><strong>Workers idle ~25%</strong>: Waiting for the I/O pipeline to deliver chunks. The pipeline depth (16
+          reads + 16 writes in flight) isn't always enough to keep all 5 workers saturated.</li>
+        <li><strong>L3 cache contention</strong>: My Ryzen 4600H has two CCX modules, each with 4 cores and 4MB L3.
+          Workers on the same CCX share 4MB L3, and the 8 MiB chunk buffers + key tables don't all fit. There's
+          inevitable L3 pressure.</li>
+      </ul>
+
+      <div class="section-break">* * *</div>
+
+      <h2>Cross-Compatibility: Making Sure It Actually Works</h2>
+
+      <p>Performance is meaningless if your encryption is wrong. One of the first things I did was verify that the new
+        AVX2 cipher in Low-Latency-Lab produces <em>exactly</em> the same output as the old single-threaded
+        Bit-level-encryption-v1.0. Same cipher, same key tables, same rounds — just different implementations.</p>
+
+      <p>I wrote a cross-benchmark script that runs four tests:</p>
+
+      <div class="timeline-step">
+        <div class="timeline-num">1.</div>
+        <div class="timeline-content">Bit-level encrypt → Bit-level decrypt (self-test)</div>
+      </div>
+      <div class="timeline-step">
+        <div class="timeline-num">2.</div>
+        <div class="timeline-content">TeraCrypt encrypt → TeraCrypt decrypt (self-test)</div>
+      </div>
+      <div class="timeline-step">
+        <div class="timeline-num">3.</div>
+        <div class="timeline-content">Bit-level encrypt → TeraCrypt decrypt (cross-test)</div>
+      </div>
+      <div class="timeline-step">
+        <div class="timeline-num">4.</div>
+        <div class="timeline-content">TeraCrypt encrypt → Bit-level decrypt (cross-test)</div>
+      </div>
+
+      <p>All four pass. Files encrypted by either implementation decrypt correctly with the other. The crypto core is
+        identical — only the I/O and parallelization layer changed.</p>
+
+      <div class="section-break">* * *</div>
+
+      <h2>What I Learned</h2>
+
+      <p>This project taught me more about real-world performance engineering than any textbook or course ever could.
+        Here's the distilled version:</p>
+
+      <ul>
+        <li><strong>Measure, don't assume.</strong> Threads vs processes, SQPOLL vs explicit submit, buffered vs
+          O_DIRECT — in every case, conventional wisdom or theory pointed one way and the hardware pointed another.
+          <code>perf stat</code> and <code>perf record</code> are your best friends.</li>
+        <li><strong>Every "optimization" is a hypothesis.</strong> SQPOLL was supposed to eliminate syscalls. Instead it
+          introduced 46,000 context switches. The page cache was supposed to speed up reads. Instead it added a 37%
+          overhead. Don't trust the pitch — measure the result.</li>
+        <li><strong>One instruction can save billions.</strong> A single <code>PAUSE</code> instruction cut 48% of
+          wasted instructions. The smallest changes can have the biggest impact when they're at the right place.</li>
+        <li><strong>Know your workload.</strong> Streaming I/O is not random access. Sequential reads are not database
+          queries. The page cache that's essential for a database is pure overhead for a one-pass encryption pipeline.
+          Optimize for your actual access pattern, not the general case.</li>
+        <li><strong>Your power profile is part of the benchmark.</strong> A 30% frequency difference from battery
+          throttling can mask real performance changes. Always control your power state.</li>
+        <li><strong>Understand contention before optimizing data structures.</strong> SPMC/MPSC queues are theoretically
+          cheaper than MPMC, but if the contention is on the multi-access side (which it was), specialization doesn't
+          help. Know where the cache line bounces actually happen.</li>
+        <li><strong>PGO is free performance.</strong> Three compile phases, one representative run, and the compiler
+          does the rest. No code changes needed. Just don't forget to re-profile after every change.</li>
+      </ul>
+
+      <div class="section-break">* * *</div>
+
+      <h2>What's Next</h2>
+
+      <p>TeraCrypt v4.0 is at 1.33 GB/s with 3.4x scaling. The remaining gap to linear scaling is mostly hardware — L3
+        cache pressure, I/O pipeline saturation, and the parent core not doing crypto. To push further, I'd need to look
+        at:</p>
+
+      <ul>
+        <li><strong>NUMA-aware buffer allocation</strong> — on multi-socket systems, ensuring chunk buffers are local to
+          the worker's NUMA node</li>
+        <li><strong>Larger pipeline depth</strong> — more in-flight reads to keep workers saturated, at the cost of more
+          memory</li>
+        <li><strong>AVX-512</strong> — if I had a CPU that supported it, 512-bit registers would double the SIMD width
+          again. But my Ryzen 4600H doesn't have AVX-512, and AMD's implementation is double-pumped anyway, so the gains
+          would be modest</li>
+        <li><strong>I/O pipeline tuning</strong> — experimenting with <code>io_uring</code> parameters like
+          <code>IORING_SETUP_COOP_TASKRUN</code> and registered buffers (<code>IORING_REGISTER_BUFFERS</code>) to reduce
+          even more kernel overhead</li>
+      </ul>
+
+      <p>But honestly? The most exciting part wasn't the final number. It was the journey. Starting with a 2.1x scaling
+        that made no sense, digging through <code>perf</code> output at 3am, finding a kernel thread silently stealing
+        40% of a core, discovering the page cache was eating a third of my throughput, and watching each fix land like a
+        piece of a puzzle clicking into place.</p>
+
+      <p>That's the fun. Not the destination — the detective work. The moment you look at a <code>perf annotate</code>
+        output and <em>understand</em> why your code is slow. That moment when you change one line and the throughput
+        jumps 47%. That's what I live for.</p>
+
+      <p>Anyway. It's 3am again. I should probably sleep. But there's this thing in the <code>perf report</code> I want
+        to look at one more time...</p>
+
+      <div class="section-break">* * *</div>
+
+      <p style="color:var(--muted);font-size:.9rem;margin-top:2rem">All benchmarks were run on an AMD Ryzen 5 4600H (6
+        cores / 12 threads, SMT disabled), 16GB DDR4, NVMe SSD, Linux 6.x, with caches dropped via
+        <code>echo 3 &gt; /proc/sys/vm/drop_caches</code> before each run. PGO-compiled with Clang using
+        <code>-Ofast -flto -march=native</code>. The full source code is at <a
+          href="https://github.com/GurudattaRK/Low-Latency-Lab" target="_blank"
+          rel="noopener">github.com/GurudattaRK/Low-Latency-Lab</a>.</p>
+
+    </article>
+  </main>
+
+  <footer>
+    <span>&copy; 2026 Gurudatta R K</span>
+    <div class="social">
+      <a href="https://github.com/GurudattaRK" target="_blank" rel="noopener" aria-label="GitHub">
+        <svg>
+          <use href="assets/icons.svg#github" />
+        </svg>
+      </a>
+      <a href="https://www.linkedin.com/in/gurudatta-r-k/" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg>
+          <use href="assets/icons.svg#linkedin" />
+        </svg>
+      </a>
+      <a href="mailto:gurudatta.kondampallikar@gmail.com" aria-label="Email">
+        <svg>
+          <use href="assets/icons.svg#email" />
+        </svg>
+      </a>
+    </div>
+  </footer>
+</body>
+
+</html>
