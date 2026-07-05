@@ -151,3 +151,37 @@ footer svg{width:18px;height:18px;fill:currentColor}
   footer{flex-direction:column;gap:1rem;text-align:center}
   .squircle-grid{grid-template-columns:1fr;max-width:280px}
 }
+
+/* ==========================================================================
+   VIEW TRANSITIONS — smooth cross-page navigation
+   ========================================================================== */
+@view-transition {
+  navigation: auto;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  main {
+    view-transition-name: page-content;
+  }
+
+  ::view-transition-group(page-content) {
+    animation-duration: 0.4s;
+    animation-timing-function: ease-in-out;
+  }
+
+  ::view-transition-old(page-content) {
+    animation-name: vt-slide-out;
+  }
+
+  ::view-transition-new(page-content) {
+    animation-name: vt-slide-in;
+  }
+
+  @keyframes vt-slide-out {
+    to { translate: -100vw; }
+  }
+
+  @keyframes vt-slide-in {
+    from { translate: 100vw; }
+  }
+}
