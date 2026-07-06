@@ -12,46 +12,45 @@
     href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9A%A1%3C/text%3E%3C/svg%3E">
 </head>
 
-<body>
+<body class="has-sidenav">
   <object class="circuit-bg" data="assets/circuit.svg" type="image/svg+xml"></object>
-  <nav class="a1">
-    <a href="index.html" class="squircle nav-squircle">
-      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke-linecap="round" stroke-linejoin="round" />
-        <path d="M9 22V12h6v10" stroke-linecap="round" stroke-linejoin="round" />
-      </svg>
-      <span>Home</span>
-    </a>
-    <div class="links">
-      <a href="projects.html" class="squircle nav-squircle active">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" stroke-linecap="round"
-            stroke-linejoin="round" />
-        </svg>
+
+  <nav class="sidenav a1">
+    <div class="sidenav-brand">
+      <span class="sidenav-brand-dot"></span>
+      Explore
+    </div>
+    <div class="sidenav-links">
+      <a href="index.html" class="sidenav-btn">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 22V12h6v10" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>Home</span>
+      </a>
+      <a href="about.html" class="sidenav-btn">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>About</span>
+      </a>
+      <a href="projects.html" class="sidenav-btn active">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" stroke-linecap="round" stroke-linejoin="round"/></svg>
         <span>Projects</span>
       </a>
-      <a href="thoughts.html" class="squircle nav-squircle">
-        <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" class="bulb">
-          <path
-            d="M16,7a8.36,8.36,0,0,0-8,8,8.4,8.4,0,0,0,2.29,5.7A4.56,4.56,0,0,1,12,24a1,1,0,0,0,1,1h6a1,1,0,0,0,1-1,4.46,4.46,0,0,1,1.69-3.28A7.87,7.87,0,0,0,24,15a8.17,8.17,0,0,0-2.44-5.83A7.67,7.67,0,0,0,16,7Zm4.34,12.28A6.87,6.87,0,0,0,18.09,23H13.91a7,7,0,0,0-2.2-3.71A6.41,6.41,0,0,1,10,15a6.29,6.29,0,0,1,6-6,5.63,5.63,0,0,1,4.13,1.6A6.16,6.16,0,0,1,22,15,5.93,5.93,0,0,1,20.31,19.28Z" />
-          <path d="M19,26H13a1,1,0,0,0,0,2h6a1,1,0,0,0,0-2Z" />
-          <path d="M18,29H14a1,1,0,0,0,0,2h4a1,1,0,0,0,0-2Z" />
-          <path d="M16,5a1,1,0,0,0,1-1V2a1,1,0,0,0-2,0V4A1,1,0,0,0,16,5Z" />
-          <path d="M5,14H3a1,1,0,0,0,0,2H5a1,1,0,0,0,0-2Z" />
-          <path d="M29,14H27a1,1,0,0,0,0,2h2a1,1,0,0,0,0-2Z" />
-          <path
-            d="M25.9,5.1a1,1,0,0,0-1.41,0L23.07,6.51a1,1,0,0,0,0,1.42,1,1,0,0,0,.71.29,1,1,0,0,0,.71-.29L25.9,6.51A1,1,0,0,0,25.9,5.1Z" />
-          <path
-            d="M8.93,7.93a1,1,0,0,0,0-1.42L7.51,5.1A1,1,0,0,0,6.1,6.51L7.51,7.93a1,1,0,0,0,.71.29A1,1,0,0,0,8.93,7.93Z" />
-        </svg>
-        <span>My thoughts</span>
+      <a href="thoughts.html" class="sidenav-btn">
+        <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" class="bulb"><path d="M16,7a8.36,8.36,0,0,0-8,8,8.4,8.4,0,0,0,2.29,5.7A4.56,4.56,0,0,1,12,24a1,1,0,0,0,1,1h6a1,1,0,0,0,1-1,4.46,4.46,0,0,1,1.69-3.28A7.87,7.87,0,0,0,24,15a8.17,8.17,0,0,0-2.44-5.83A7.67,7.67,0,0,0,16,7Zm4.34,12.28A6.87,6.87,0,0,0,18.09,23H13.91a7,7,0,0,0-2.2-3.71A6.41,6.41,0,0,1,10,15a6.29,6.29,0,0,1,6-6,5.63,5.63,0,0,1,4.13,1.6A6.16,6.16,0,0,1,22,15,5.93,5.93,0,0,1,20.31,19.28Z"/><path d="M19,26H13a1,1,0,0,0,0,2h6a1,1,0,0,0,0-2Z"/><path d="M18,29H14a1,1,0,0,0,0,2h4a1,1,0,0,0,0-2Z"/><path d="M16,5a1,1,0,0,0,1-1V2a1,1,0,0,0-2,0V4A1,1,0,0,0,16,5Z"/><path d="M5,14H3a1,1,0,0,0,0,2H5a1,1,0,0,0,0-2Z"/><path d="M29,14H27a1,1,0,0,0,0,2h2a1,1,0,0,0,0-2Z"/><path d="M25.9,5.1a1,1,0,0,0-1.41,0L23.07,6.51a1,1,0,0,0,0,1.42,1,1,0,0,0,.71.29,1,1,0,0,0,.71-.29L25.9,6.51A1,1,0,0,0,25.9,5.1Z"/><path d="M8.93,7.93a1,1,0,0,0,0-1.42L7.51,5.1A1,1,0,0,0,6.1,6.51L7.51,7.93a1,1,0,0,0,.71.29A1,1,0,0,0,8.93,7.93Z"/></svg>
+        <span>Thoughts</span>
       </a>
-      <a href="about.html" class="squircle nav-squircle">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" stroke-linecap="round" stroke-linejoin="round" />
-          <circle cx="12" cy="7" r="4" />
-        </svg>
-        <span>About me</span>
+    </div>
+    <div class="sidenav-divider"></div>
+    <div class="sidenav-links">
+      <a href="Gurudatta_Resume.pdf" target="_blank" class="sidenav-btn sidenav-ext">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>Resume</span>
+      </a>
+      <a href="https://github.com/GurudattaRK" target="_blank" rel="noopener" class="sidenav-btn sidenav-ext">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="fill-icon"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+        <span>GitHub</span>
+      </a>
+      <a href="https://www.linkedin.com/in/gurudatta-r-k/" target="_blank" rel="noopener" class="sidenav-btn sidenav-ext">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="fill-icon"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        <span>LinkedIn</span>
       </a>
     </div>
   </nav>
@@ -61,7 +60,7 @@
     <p class="page-sub a2">Low-latency tools, assembly engines, and performance experiments.</p>
 
     <div class="a3" style="display:grid;gap:1.5rem">
-      <article class="card a3">
+      <article class="card a3" onclick="if(!event.target.closest('a'))window.open('https://github.com/GurudattaRK/Low-Latency-Lab','_blank')">
         <h2>Low-Latency-Lab</h2>
         <p>An initiative to rebuild and optimize my earlier projects with modern high-performance computing
           techniques. Each project is re-engineered from the ground up with hardware-aware design — CPU cache
@@ -84,7 +83,7 @@
         </a>
       </article>
 
-      <article class="card a3">
+      <article class="card a3" onclick="if(!event.target.closest('a'))window.open('https://github.com/GurudattaRK/PicoPerf','_blank')">
         <h2>PicoPerf</h2>
         <p>Zero-overhead PMU benchmarking library for x86-64 Linux. Captures hardware-native CPU metrics directly from
           x86-64 registers via perf_event_open — retired instructions, cycles, IPC, cache misses, TLB misses — with
@@ -104,7 +103,7 @@
         </a>
       </article>
 
-      <article class="card a4">
+      <article class="card a4" onclick="if(!event.target.closest('a'))window.open('https://github.com/GurudattaRK/Low-Latency-Lab','_blank')">
         <h2>TeraCrypt v4.0</h2>
         <p>Multi-process async encryption pipeline using Linux io_uring for zero-syscall I/O, lock-free Vyukov MPMC
           queues for cross-process chunk dispatch, AVX2 SIMD for block encryption, and O_DIRECT for zero-copy disk I/O.
@@ -131,7 +130,7 @@
         </a>
       </article>
 
-      <article class="card">
+      <article class="card" onclick="if(!event.target.closest('a'))window.open('https://github.com/GurudattaRK/Project-CUDA','_blank')">
         <h2>CUDA Cipher</h2>
         <p>GPU-parallelized encryption kernel for NVIDIA CUDA. Coalesced global memory access with dynamic thread-block
           tuning at runtime. Benchmarked against CPU baselines to quantify throughput vs latency trade-offs across
@@ -150,7 +149,7 @@
         </a>
       </article>
 
-      <article class="card">
+      <article class="card" onclick="if(!event.target.closest('a'))window.open('https://github.com/GurudattaRK/Low-Latency-Lab','_blank')">
         <h2>Bit-Level Encryption — AVX2 Optimized</h2>
         <p>Single-threaded reference implementation of a custom 128-bit block cipher, hand-optimized with AVX2
           intrinsics for two-block parallel encryption. PGO-compiled with Clang using -Ofast -flto -march=native. Serves
@@ -171,7 +170,7 @@
         </a>
       </article>
 
-      <article class="card">
+      <article class="card" onclick="if(!event.target.closest('a'))window.open('https://github.com/GurudattaRK/1024-Bit-encryption-v1.1','_blank')">
         <h2>1024-Bit Assembly Cipher</h2>
         <p>Full x86-64 assembly rewrite of the C reference cipher for maximum execution speed. The computationally
           intensive encryption core is written entirely in x64 assembly with register-level control, manual calling
@@ -189,7 +188,7 @@
         </a>
       </article>
 
-      <article class="card">
+      <article class="card" onclick="if(!event.target.closest('a'))window.open('https://github.com/GurudattaRK/PQrypt','_blank')">
         <h2>PQrypt</h2>
         <p>Cross-platform post-quantum cryptographic application built in Rust with Slint UI. Integrates ML-KEM-1024,
           HQC-256, SLH-DSA, X448, ChaCha20, AES-256-GCM, and Argon2id for quantum-resistant file encryption and secure
