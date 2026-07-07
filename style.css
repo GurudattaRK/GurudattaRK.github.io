@@ -15,6 +15,7 @@
   --s: 1.5rem;
   --mw: 720px;
   --sidenav-w: 210px;
+  --sidenav-collapsed: 100px;
 }
 
 *{margin:0;padding:0;box-sizing:border-box}
@@ -42,8 +43,10 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);line-he
   position: fixed;
   top: 0;
   left: 0;
-  width: var(--sidenav-w);
+  width: var(--sidenav-collapsed);
   height: 100vh;
+  overflow: hidden;
+  transition: width 0.28s cubic-bezier(0.4,0,0.2,1);
   background: rgba(8,8,8,0.50);
   backdrop-filter: blur(18px) saturate(140%);
   -webkit-backdrop-filter: blur(18px) saturate(140%);
@@ -60,7 +63,8 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);line-he
   font-family: var(--font-body);
   font-size: 0.62rem;
   font-weight: 600;
-  color: var(--muted);
+  color: var(--accent);
+  text-shadow: 0 0 10px var(--accent), 0 0 20px rgba(34,211,238,0.4);
   letter-spacing: 0.20em;
   text-transform: uppercase;
   padding: 0.4rem 1rem 1.5rem;
@@ -70,6 +74,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);line-he
 }
 
 .sidenav-brand-dot {
+  display: none;
   width: 6px;
   height: 6px;
   background: var(--accent);
@@ -84,17 +89,12 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);line-he
   gap: 0;
 }
 
-.sidenav-divider {
-  height: 1px;
-  background: var(--border);
-  margin: 0.85rem 0;
-}
 
 .sidenav-btn {
   display: flex;
   align-items: center;
   gap: 0.8rem;
-  padding: 1.75rem 1rem;
+  padding: 2.4rem 1rem;
   border-radius: 0;
   color: var(--muted);
   text-decoration: none;
@@ -178,18 +178,21 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);line-he
    LAYOUT — pages with sidenav
    ========================================================================== */
 body.has-sidenav {
-  padding-left: var(--sidenav-w);
+  padding-left: var(--sidenav-collapsed);
 }
+.sidenav:hover{width:var(--sidenav-w)}
+.sidenav-btn span{opacity:0;max-width:0;overflow:hidden;white-space:nowrap;transition:opacity 0.15s,max-width 0.22s}
+.sidenav:hover .sidenav-btn span{opacity:1;max-width:200px}
 
-main{max-width:1300px;margin:1.5rem 0.5rem 2rem -3rem;padding:3rem 15rem 4rem 6rem;background:rgba(12,12,16,0.45);backdrop-filter:blur(14px) saturate(130%);-webkit-backdrop-filter:blur(14px) saturate(130%);border-radius:24px;border:1px solid rgba(255,255,255,0.06);position:relative;mask:linear-gradient(to right,transparent 0px,black 90px,black calc(100% - 220px),transparent);-webkit-mask:linear-gradient(to right,transparent 0px,black 90px,black calc(100% - 220px),transparent)}
+main{max-width:1300px;margin:-8rem auto 2rem auto;padding:11rem 15rem 4rem 6rem;background:rgba(12,12,16,0.45);backdrop-filter:blur(14px) saturate(130%);-webkit-backdrop-filter:blur(14px) saturate(130%);border-radius:0 0 24px 24px;border:1px solid rgba(255,255,255,0.06);position:relative;mask:linear-gradient(to right,transparent 0px,black 90px,black calc(100% - 220px),transparent);-webkit-mask:linear-gradient(to right,transparent 0px,black 90px,black calc(100% - 220px),transparent)}
 
 /* ==========================================================================
    HERO
    ========================================================================== */
-.hero{min-height:80vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;position:relative;overflow:hidden;padding-top:1rem}
-.hi{font-size:1rem;color:var(--accent);font-family:var(--font-mono);margin-bottom:.4rem;letter-spacing:.06em;font-weight:600}
-.hero h1{font-size:clamp(3.2rem,5.5vw,5.5rem);font-weight:800;letter-spacing:-.04em;line-height:1.0;margin-bottom:.7rem;white-space:nowrap}
-.hero .tagline{font-size:clamp(1.05rem,2.2vw,1.4rem);color:var(--muted);margin-bottom:1.5rem;font-weight:500}
+.hero{min-height:80vh;display:flex;flex-direction:column;justify-content:center;align-items:stretch;position:relative;overflow:hidden;padding-top:1rem}
+.hi{font-size:clamp(1.05rem,2.2vw,4rem);color:var(--accent);margin-bottom:.4rem;letter-spacing:.02em;font-weight:500;text-align:justify;padding-left:16%}
+.hero h1{font-size:clamp(3.2rem,5.5vw,5.5rem);font-weight:800;letter-spacing:-.04em;line-height:1.0;margin-bottom:.7rem;white-space:nowrap;text-align:center}
+.hero .tagline{font-size:clamp(1.05rem,2.2vw,1.4rem);color:var(--muted);margin-bottom:1.5rem;font-weight:500;text-align:center;padding-left:6%}
 .tagline .norm{color:var(--muted);font-weight:400}
 .tagline .bold{color:var(--text);font-weight:700}
 
@@ -197,6 +200,18 @@ main{max-width:1300px;margin:1.5rem 0.5rem 2rem -3rem;padding:3rem 15rem 4rem 6r
 .email-row a{color:var(--accent);text-decoration:none;transition:opacity .2s ease}
 .email-row a:hover{opacity:.8}
 .email-row svg{width:18px;height:18px;fill:currentColor}
+.tagline-right{text-align:right}
+.hero-bio{color:var(--muted);max-width:680px;font-size:.95rem;line-height:1.7;text-align:center;margin:0 auto 1.5rem}
+.hero-contact{display:flex;flex-direction:column;align-items:center;gap:.65rem;margin-top:1.5rem}
+.hero-contact-item{display:flex;align-items:center;gap:.5rem;color:var(--muted);font-size:.9rem}
+.hero-contact-item svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.5;flex-shrink:0}
+.hero-contact-item svg.fill-icon{fill:currentColor;stroke:none}
+.hero-contact-item a{color:var(--accent);text-decoration:none;transition:opacity .2s}
+.hero-contact-item a:hover{opacity:.8}
+.email-select{color:var(--accent);user-select:all;cursor:text}
+.hero-resume-btn{cursor:pointer;pointer-events:all;display:inline-flex;align-items:center;gap:.4rem;margin-top:.5rem;padding:.5rem 1.2rem;background:rgba(34,211,238,0.08);border:1px solid var(--accent-dim);border-radius:6px;color:var(--accent);text-decoration:none;font-size:.85rem;font-weight:600;letter-spacing:.04em;transition:background .18s,border-color .18s}
+.hero-resume-btn:hover{background:rgba(34,211,238,0.15);border-color:var(--accent)}
+.hero-resume-btn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
 
 /* ==========================================================================
    SQUIRCLE GRID (kept for possible reuse)
