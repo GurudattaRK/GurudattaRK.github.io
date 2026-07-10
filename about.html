@@ -57,26 +57,29 @@
 
   <main>
     <h1 class="page-title a1">About</h1>
-    <p class="page-sub a2">Systems programmer with a fascination for what happens at the hardware boundary.</p>
+    <p class="page-sub a2">Systems programmer who keeps asking "but <em>why</em> is it slow?" until the answer is in CPU cycles.</p>
 
 
     <section class="a3" style="margin-bottom:2.5rem">
-      <p style="margin-bottom:1rem">I am a systems programmer based in India, currently working at Qualys on macOS agent
-        security and Software Composition Analysis. Before that, I interned at Sentinel One doing reverse engineering
-        and detection rule optimization for macOS malware.</p>
-      <p style="margin-bottom:1rem">My real interest lies at the boundary between software and hardware — x86-64
-        microarchitecture, cache hierarchies, branch prediction, and the art of making code run as fast as the silicon
-        allows. I built PicoPerf to answer not just <em>how long</em> a code path takes, but <em>why</em> — by isolating
-        cache pressure, branch mispredictions, and IPC degradation as independent hardware signals.</p>
+      <p style="margin-bottom:1rem">I'm a systems programmer based in India, currently at Qualys working on macOS
+        agent security and Software Composition Analysis. Before that, I interned at SentinelOne reverse-engineering
+        macOS malware and writing detection rules — which is where I learned that understanding the attacker means
+        understanding the machine.</p>
+      <p style="margin-bottom:1rem">But the thing that keeps me up at night is performance. Not the "make it faster"
+        kind — the "understand exactly <em>why</em> the CPU is stalling on this instruction" kind. x86-64
+        microarchitecture, cache hierarchies, branch prediction, the memory bus. I built
+        <a href="https://github.com/GurudattaRK/PicoPerf" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none">PicoPerf</a>
+        because I wanted to stop guessing and start <em>measuring</em> — retired instructions, cache misses, branch
+        mispredictions, all as independent hardware signals at single-cycle resolution.</p>
       <p style="margin-bottom:1rem">Through <a href="https://github.com/GurudattaRK/Low-Latency-Lab" target="_blank"
           rel="noopener" style="color:var(--accent);text-decoration:none">Low-Latency-Lab</a>,
-        I rebuild my earlier projects with modern HPC techniques — io_uring async I/O, AVX2 SIMD, lock-free MPMC queues,
-        O_DIRECT zero-copy disk I/O, multi-process worker pools with CPU pinning, and PGO compilation. The work involves
-        deep perf profiling to identify bottlenecks at the instruction and cache-line level, then systematically
-        eliminating them — from removing SQPOLL kernel-thread contention to cutting 48% of wasted spin-loop
-        instructions.</p>
-      <p>When I am not writing assembly or staring at perf stat output, I am reading about physics, mathematics, or
-        philosophy — usually at 3am.</p>
+        I take my old projects apart and rebuild them with everything I now know about the hardware. io_uring async I/O,
+        AVX2 SIMD, lock-free queues, O_DIRECT, CPU pinning, PGO — then profile with <code>perf</code> and optimize until
+        the silicon is the bottleneck, not my code. The fun part? Finding a kernel thread silently stealing 40% of a
+        core, or discovering that a single <code>PAUSE</code> instruction can cut 48% of wasted instructions. Those
+        moments are better than coffee.</p>
+      <p>When I'm not writing assembly or staring at <code>perf stat</code> output, I'm reading about physics,
+        mathematics, or philosophy. Usually at 3am. The obsession is real.</p>
     </section>
 
     <section class="a4" style="margin-bottom:2.5rem">

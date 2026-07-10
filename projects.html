@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description"
-    content="Projects by Gurudatta R K — PicoPerf, TeraCrypt, CUDA Cipher, and more low-latency systems work.">
+    content="Projects by Gurudatta R K — Low-Latency-Lab, PicoPerf, TeraCrypt, Bit-Level Encryption, and more low-latency systems work.">
   <title>Projects — Gurudatta R K</title>
   <link rel="stylesheet" href="style.css">
   <link rel="icon"
@@ -57,16 +57,16 @@
 
   <main>
     <h1 class="page-title a1">Projects</h1>
-    <p class="page-sub a2">Low-latency tools, assembly engines, and performance experiments.</p>
+    <p class="page-sub a2">Things I built because I was curious what happens when you push code right up against the silicon.</p>
 
     <div class="a3" style="display:grid;gap:1.5rem">
       <article class="card a3" onclick="if(!event.target.closest('a'))window.open('https://github.com/GurudattaRK/Low-Latency-Lab','_blank')">
         <h2>Low-Latency-Lab</h2>
-        <p>An initiative to rebuild and optimize my earlier projects with modern high-performance computing
-          techniques. Each project is re-engineered from the ground up with hardware-aware design — CPU cache
-          topology, AVX2 SIMD, async I/O via io_uring, lock-free data structures, PGO compilation, and perf-based
-          profiling. Includes detailed benchmarking with perf stat/record to identify and eliminate bottlenecks at
-          the instruction and cache-line level.</p>
+        <p>I take my old projects and re-engineer them with everything I've learned about how the hardware
+          actually works. Each one gets profiled with <code>perf stat</code>/<code>record</code>, then optimized at
+          the instruction and cache-line level until the CPU is the bottleneck instead of my code. AVX2 SIMD,
+          io_uring async I/O, lock-free queues, O_DIRECT, CPU pinning, PGO — the full toolkit. This is where I
+          learn by breaking things and measuring what happens.</p>
         <div class="tags">
           <span class="tag">HPC</span>
           <span class="tag">Performance Engineering</span>
@@ -85,9 +85,10 @@
 
       <article class="card a3" onclick="if(!event.target.closest('a'))window.open('https://github.com/GurudattaRK/PicoPerf','_blank')">
         <h2>PicoPerf</h2>
-        <p>Zero-overhead PMU benchmarking library for x86-64 Linux. Captures hardware-native CPU metrics directly from
-          x86-64 registers via perf_event_open — retired instructions, cycles, IPC, cache misses, TLB misses — with
-          nanosecond resolution using RDTSCP.</p>
+        <p>I wanted to know not just <em>how fast</em> my code was, but <em>why</em> it was slow. So I built a
+          library that talks directly to the CPU's performance monitoring unit — retired instructions, cycles, IPC,
+          cache misses, TLB misses — all captured at single-cycle resolution using RDTSCP. No sampling, no
+          interpolation, just raw hardware truth.</p>
         <div class="tags">
           <span class="tag">C</span>
           <span class="tag">x86-64 Assembly</span>
@@ -105,10 +106,12 @@
 
       <article class="card a4" onclick="if(!event.target.closest('a'))window.open('https://github.com/GurudattaRK/Low-Latency-Lab','_blank')">
         <h2>TeraCrypt v4.0</h2>
-        <p>Multi-process async encryption pipeline using Linux io_uring for zero-syscall I/O, lock-free Vyukov MPMC
-          queues for cross-process chunk dispatch, AVX2 SIMD for block encryption, and O_DIRECT for zero-copy disk I/O.
-          5 worker processes pinned to physical cores via CPU affinity, with PGO-compiled binaries achieving 1.33 GB/s
-          throughput — a 3.4x scaling over the single-threaded baseline on a 6-core AMD Ryzen 4600H.</p>
+        <p>Rebuilt from my earlier Python+assembly version into a pure-C multi-process pipeline. io_uring for async
+          I/O, lock-free Vyukov MPMC queues for cross-process chunk dispatch, AVX2 SIMD for two-block parallel
+          encryption, O_DIRECT to bypass the page cache. 5 workers pinned to physical cores, PGO-compiled.
+          <strong>1.44 GB/s</strong> on a 6-core AMD Ryzen 4600H — and every percent of that was earned the hard
+          way. <a href="teracrypt-journey.html" style="color:var(--accent);text-decoration:none">Read the story
+          &rarr;</a></p>
         <div class="tags">
           <span class="tag">C</span>
           <span class="tag">io_uring</span>
@@ -124,17 +127,13 @@
             <use href="assets/icons.svg#external" />
           </svg> View on GitHub
         </a>
-        <a href="teracrypt-journey.html"
-          style="display:inline-flex;align-items:center;gap:.4rem;margin-top:.75rem;margin-left:1rem;color:var(--accent);text-decoration:none;font-size:.85rem">
-          Read the build journey &rarr;
-        </a>
       </article>
 
       <article class="card" onclick="if(!event.target.closest('a'))window.open('https://github.com/GurudattaRK/Project-CUDA','_blank')">
         <h2>CUDA Cipher</h2>
-        <p>GPU-parallelized encryption kernel for NVIDIA CUDA. Coalesced global memory access with dynamic thread-block
-          tuning at runtime. Benchmarked against CPU baselines to quantify throughput vs latency trade-offs across
-          execution models.</p>
+        <p>Ported my cipher to NVIDIA CUDA to see how GPU throughput compares to CPU latency. Coalesced memory
+          access, dynamic thread-block tuning, benchmarked against CPU baselines. The answer: it depends, and the
+          trade-offs are fascinating.</p>
         <div class="tags">
           <span class="tag">CUDA</span>
           <span class="tag">C</span>
@@ -151,10 +150,12 @@
 
       <article class="card" onclick="if(!event.target.closest('a'))window.open('https://github.com/GurudattaRK/Low-Latency-Lab','_blank')">
         <h2>Bit-Level Encryption — AVX2 Optimized</h2>
-        <p>Single-threaded reference implementation of a custom 128-bit block cipher, hand-optimized with AVX2
-          intrinsics for two-block parallel encryption. PGO-compiled with Clang using -Ofast -flto -march=native. Serves
-          as the single-threaded baseline for benchmarking TeraCrypt v4.0, with verified cross-compatibility — files
-          encrypted by either implementation decrypt correctly with the other.</p>
+        <p>The single-threaded reference cipher that TeraCrypt's crypto core is built on. 1024-bit (128-byte) blocks (32×32
+          bit matrix), 8 rounds of per-lane rotation + XOR + bit-matrix transpose. AVX2 intrinsics for in-register
+          operations, PGO-compiled. Went from <strong>5 minutes per GB</strong> in the
+          <a href="https://github.com/GurudattaRK/Bit-level-encryption-v1.0" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none">original implementation</a>
+          to <strong>0.4 GB/s</strong> — roughly an 11,900% improvement. Cross-verified: files encrypted by either
+          version decrypt correctly with the other.</p>
         <div class="tags">
           <span class="tag">C</span>
           <span class="tag">AVX2 Intrinsics</span>
@@ -172,9 +173,9 @@
 
       <article class="card" onclick="if(!event.target.closest('a'))window.open('https://github.com/GurudattaRK/1024-Bit-encryption-v1.1','_blank')">
         <h2>1024-Bit Assembly Cipher</h2>
-        <p>Full x86-64 assembly rewrite of the C reference cipher for maximum execution speed. The computationally
-          intensive encryption core is written entirely in x64 assembly with register-level control, manual calling
-          conventions, and loop unrolling — compiled for both Linux and Windows.</p>
+        <p>My cipher, rewritten entirely in x86-64 assembly. Register-level control, manual calling conventions,
+          loop unrolling — no compiler between me and the metal. Built for both Linux and Windows, because
+          portability matters even when you're hand-coding instructions.</p>
         <div class="tags">
           <span class="tag">x86-64 Assembly</span>
           <span class="tag">C</span>
@@ -190,9 +191,9 @@
 
       <article class="card" onclick="if(!event.target.closest('a'))window.open('https://github.com/GurudattaRK/PQrypt','_blank')">
         <h2>PQrypt</h2>
-        <p>Cross-platform post-quantum cryptographic application built in Rust with Slint UI. Integrates ML-KEM-1024,
-          HQC-256, SLH-DSA, X448, ChaCha20, AES-256-GCM, and Argon2id for quantum-resistant file encryption and secure
-          messaging. Best Final Year Project 2024.</p>
+        <p>Post-quantum cryptography doesn't have to be intimidating. I built a cross-platform app with Rust + Slint
+          that integrates ML-KEM-1024, HQC-256, SLH-DSA, and the usual symmetric suspects for quantum-resistant file
+          encryption. Won Best Final Year Project 2024 at PES University.</p>
         <div class="tags">
           <span class="tag">Rust</span>
           <span class="tag">Post-Quantum</span>
